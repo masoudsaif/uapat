@@ -9,12 +9,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 const PlanCreatorDrawer = memo(() => {
   const dispatch = useDispatch();
-  const { isDrawerOpen } = useSelector(settingsState);
+  const { isBlockDrawerOpen } = useSelector(settingsState);
 
-  const handleDrawerClose = () => dispatch(turnOff("isDrawerOpen"));
+  const handleDrawerClose = () => dispatch(turnOff("isBlockDrawerOpen"));
 
   return (
-    <Slide in={isDrawerOpen} direction="left" mountOnEnter unmountOnExit>
+    <Slide in={isBlockDrawerOpen} direction="left" mountOnEnter unmountOnExit>
       <Grid
         container
         sx={{
@@ -33,7 +33,14 @@ const PlanCreatorDrawer = memo(() => {
           container
           direction="column"
           sx={{ top: 0, position: "absolute" }}
-        ></Grid>
+        >
+          <StyledDrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronRightIcon />
+            </IconButton>
+          </StyledDrawerHeader>
+          <Divider />
+        </Grid>
       </Grid>
     </Slide>
   );
