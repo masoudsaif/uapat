@@ -1,6 +1,6 @@
 enum SystemUnit {
-  "Metric" = "Metric",
-  "Imperial" = "Imperial",
+  "METRIC" = "METRIC",
+  "IMPERIAL" = "IMPERIAL",
 }
 
 export default SystemUnit;

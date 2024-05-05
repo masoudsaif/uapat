@@ -19,7 +19,7 @@ const initialState: ISettings = {
   ...booleans,
   wallWidth: 2,
   pixelRatio: 3.9,
-  systemUnit: SystemUnit.Metric,
+  systemUnit: SystemUnit.METRIC,
 };
 
 const settingsSlice = createSlice({
