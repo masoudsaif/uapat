@@ -7,7 +7,7 @@ import { Divider, Grid, IconButton, Slide } from "@mui/material";
 import { memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-const PlanCreatorDrawer = memo(() => {
+const BlockDrawer = memo(() => {
   const dispatch = useDispatch();
   const { isBlockDrawerOpen } = useSelector(settingsState);
 
@@ -46,4 +46,4 @@ const PlanCreatorDrawer = memo(() => {
   );
 });
 
-export default PlanCreatorDrawer;
+export default BlockDrawer;

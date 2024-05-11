@@ -9,7 +9,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Provider } from "react-redux";
 import theme from "./styles/theme";
 import PlanCreatorBar from "./components/PlanCreatorBar/PlanCreatorBar";
-import PlanCreatorDrawer from "./components/PlanCreatorDrawer/PlanCreatorDrawer";
+import BlockDrawer from "./components/BlockDrawer/BlockDrawer";
 
 const PlanCreator = () => {
   return (
@@ -18,7 +18,7 @@ const PlanCreator = () => {
         <CssBaseline />
         <main>
           <PlanCreatorBar />
-          <PlanCreatorDrawer />
+          <BlockDrawer />
         </main>
       </ThemeProvider>
     </Provider>

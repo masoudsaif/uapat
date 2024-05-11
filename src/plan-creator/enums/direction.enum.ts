@@ -1,6 +1,6 @@
 enum Direction {
   TOP = "TOP",
-  BOTTOM = "BOTTOm",
+  BOTTOM = "BOTTOM",
   LEFT = "LEFT",
   RIGHT = "RIGHT",
 }

@@ -1,5 +1,6 @@
-import { useTheme } from "@mui/material/styles";
-import { FC, HTMLAttributes, memo } from "react";
+import { FC, HTMLAttributes } from "react";
+
+import common from "../styles/common-colors";
 
 export interface ISelectionBoxProps extends HTMLAttributes<HTMLDivElement> {
   startX: number;
@@ -8,27 +9,27 @@ export interface ISelectionBoxProps extends HTMLAttributes<HTMLDivElement> {
   endY: number;
 }
 
-const SelectionBox: FC<ISelectionBoxProps> = memo(
-  ({ startX, startY, endX, endY, style, ...props }) => {
-    const theme = useTheme();
-
-    return (
-      <div
-        {...props}
-        style={{
-          ...style,
-          position: "absolute",
-          border: `0.5px dotted ${theme.palette.common.black}`,
-          backgroundColor: "rgba(0, 0, 0, 0.1)",
-          left: Math.min(startX, endX),
-          top: Math.min(startY, endY),
-          width: Math.abs(endX - startX),
-          height: Math.abs(endY - startY),
-          pointerEvents: "none",
-        }}
-      ></div>
-    );
-  }
+const SelectionBox: FC<ISelectionBoxProps> = ({
+  startX,
+  startY,
+  endX,
+  endY,
+  style,
+  ...props
+}) => (
+  <div
+    {...props}
+    style={{
+      ...style,
+      position: "absolute",
+      border: `0.5px dotted ${common.black}`,
+      backgroundColor: "rgba(0, 0, 0, 0.1)",
+      left: Math.min(startX, endX),
+      top: Math.min(startY, endY),
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      pointerEvents: "none",
+    }}
+  ></div>
 );
-
 export default SelectionBox;

@@ -1,3 +1,6 @@
+import StyledAppBar from "@/plan-creator/components-styled/StyledAppBar";
+import { turnOff, turnOn } from "@/redux/slices/settingsSlice";
+import { settingsState } from "@/redux/store";
 import InterestsIcon from "@mui/icons-material/Interests";
 import {
   Box,
@@ -11,17 +14,13 @@ import {
 import { MouseEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { turnOff, turnOn } from "@/redux/slices/settingsSlice";
-import { settingsState } from "@/redux/store";
-import StyledAppBar from "@/plan-creator/components-styled/StyledAppBar";
-
 const PlanCreatorBar = () => {
   const dispatch = useDispatch();
-  const { isDrawerOpen } = useSelector(settingsState);
+  const { isBlockDrawerOpen } = useSelector(settingsState);
   const [anchorElFile, setAnchorElFile] = useState<null | HTMLElement>(null);
 
   const handleDrawerOpen = () =>
-    dispatch((isDrawerOpen ? turnOff : turnOn)("isDrawerOpen"));
+    dispatch((isBlockDrawerOpen ? turnOff : turnOn)("isBlockDrawerOpen"));
 
   const handleOpenFileMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorElFile(event.currentTarget);
@@ -32,7 +31,7 @@ const PlanCreatorBar = () => {
   };
 
   return (
-    <StyledAppBar position="fixed" open={isDrawerOpen}>
+    <StyledAppBar position="fixed" open={isBlockDrawerOpen}>
       <Toolbar variant="dense">
         <Box display="flex" flex={1}>
           <Button color="inherit" onClick={handleOpenFileMenu}>

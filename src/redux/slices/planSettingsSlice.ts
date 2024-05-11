@@ -5,19 +5,21 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface IPlanSettings {
   wallWidth: number;
+  interiorWallWidth: number;
   pixelRatio: number;
   planDimensions: IDimensions;
   systemUnit: SystemUnit;
 }
 
 const initialState: IPlanSettings = {
-  wallWidth: 4,
+  wallWidth: 6,
+  interiorWallWidth: 4,
   pixelRatio: 2,
   planDimensions: {
     width: 288,
     length: 432,
   },
-  systemUnit: SystemUnit.METRIC,
+  systemUnit: SystemUnit.IMPERIAL,
 };
 
 const planSettingsSlice = createSlice({
