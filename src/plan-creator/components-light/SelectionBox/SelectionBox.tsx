@@ -1,6 +1,5 @@
+import common from "@/plan-creator/styles/common-colors";
 import { FC, HTMLAttributes } from "react";
-
-import common from "../styles/common-colors";
 
 export interface ISelectionBoxProps extends HTMLAttributes<HTMLDivElement> {
   startX: number;

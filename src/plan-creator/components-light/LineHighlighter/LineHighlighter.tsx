@@ -1,10 +1,9 @@
+import Direction from "@/plan-creator/enums/direction.enum";
+import gray from "@/plan-creator/styles/gray";
+import IBlock from "@/plan-creator/types/block.interface";
 import { planSettingsState } from "@/redux/store";
-import { useTheme } from "@mui/material";
 import { FC, HTMLAttributes, memo } from "react";
 import { useSelector } from "react-redux";
-
-import Direction from "../enums/direction.enum";
-import IBlock from "../types/block.interface";
 
 export interface ILineHighlighterProps extends HTMLAttributes<HTMLDivElement> {
   block: IBlock;
@@ -13,7 +12,6 @@ export interface ILineHighlighterProps extends HTMLAttributes<HTMLDivElement> {
 
 const LineHighlighter: FC<ILineHighlighterProps> = memo(
   ({ direction, block, style, ...props }) => {
-    const theme = useTheme();
     const {
       pixelRatio,
       planDimensions: { width, length },
@@ -25,7 +23,7 @@ const LineHighlighter: FC<ILineHighlighterProps> = memo(
         style={{
           ...style,
           position: "absolute",
-          border: `0.5px dashed ${theme.palette.grey[400]}`,
+          border: `0.5px dashed ${gray[400]}`,
           ...(direction === Direction.TOP && {
             width: length * pixelRatio,
             top: block.coordinates!.y,
