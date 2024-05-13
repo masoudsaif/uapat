@@ -2,15 +2,15 @@ import { Grid, GridProps } from "@mui/material";
 import { FC, useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import { planSettingsState } from "../../redux/store";
-import IBlock from "../types/block.interface";
-import Burner from "./Burner";
+import { planSettingsState } from "../../../redux/store";
+import IBlock from "../../types/block.interface";
+import Burner from "../Burner/Burner";
 
-export interface IFourBurnerProps extends GridProps {
+export interface ITwoBurnerProps extends GridProps {
   block: IBlock;
 }
 
-const FourBurner: FC<IFourBurnerProps> = ({
+const TwoBurner: FC<ITwoBurnerProps> = ({
   block: {
     dimensions: { width, length },
   },
@@ -20,7 +20,7 @@ const FourBurner: FC<IFourBurnerProps> = ({
   const burnerLength = useMemo(() => {
     const shorterSide = width > length ? length : width;
 
-    return shorterSide * pixelRatio - 10 / 2;
+    return shorterSide * pixelRatio - 10 - 4;
   }, [width, length, pixelRatio]);
 
   return (
@@ -29,12 +29,8 @@ const FourBurner: FC<IFourBurnerProps> = ({
         <Burner length={burnerLength} />
         <Burner length={burnerLength} />
       </Grid>
-      <Grid container justifyContent="space-evenly" mt="4px">
-        <Burner length={burnerLength} />
-        <Burner length={burnerLength} />
-      </Grid>
     </Grid>
   );
 };
 
-export default FourBurner;
+export default TwoBurner;
