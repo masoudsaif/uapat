@@ -4,17 +4,17 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import settingsReducer from "./settingsSlice";
-import planSettingsReducer from "./planSettingsSlice";
+import editorSettingsReducer from "./editorSettingsSlice";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["planSettings"],
+  whitelist: ["editorSettings"],
 };
 
 const rootReducer = combineReducers({
   settings: settingsReducer,
-  planSettings: planSettingsReducer,
+  editorSettings: editorSettingsReducer,
 });
 
 export default persistReducer(persistConfig, rootReducer);

@@ -13,7 +13,7 @@ export type RootState = ReturnType<typeof store.getState>;
 
 export const settingsState = (state: RootState) => state.settings;
 
-export const planSettingsState = (state: RootState) => state.planSettings;
+export const editorSettingsState = (state: RootState) => state.editorSettings;
 
 export const persistor = persistStore(store);
 

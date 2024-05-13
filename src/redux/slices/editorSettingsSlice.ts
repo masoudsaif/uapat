@@ -3,7 +3,8 @@ import SystemUnit from "@/plan-creator/enums/system-unit.enum";
 import IDimensions from "@/plan-creator/types/dimensions.interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface IPlanSettings {
+interface IEditorSettings {
+  highlightSensitivity: number;
   wallWidth: number;
   interiorWallWidth: number;
   pixelRatio: number;
@@ -11,7 +12,8 @@ interface IPlanSettings {
   systemUnit: SystemUnit;
 }
 
-const initialState: IPlanSettings = {
+const initialState: IEditorSettings = {
+  highlightSensitivity: 20,
   wallWidth: 6,
   interiorWallWidth: 4,
   pixelRatio: 2,
@@ -22,8 +24,8 @@ const initialState: IPlanSettings = {
   systemUnit: SystemUnit.IMPERIAL,
 };
 
-const planSettingsSlice = createSlice({
-  name: "plan-settings",
+const editorSettingsSlice = createSlice({
+  name: "editor-settings",
   initialState,
   reducers: {
     setSystemUnit(state, { payload }: PayloadAction<SystemUnit>) {
@@ -39,9 +41,9 @@ const planSettingsSlice = createSlice({
 });
 
 export const { setSystemUnit, setPixelRatio, setWallWidth } =
-  planSettingsSlice.actions;
+  editorSettingsSlice.actions;
 
-export default planSettingsSlice.reducer;
+export default editorSettingsSlice.reducer;
 
 // Pixel ratio is comparted to inches
 // 2 = 1inch

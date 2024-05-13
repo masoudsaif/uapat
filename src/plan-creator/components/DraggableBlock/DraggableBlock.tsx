@@ -1,6 +1,6 @@
 import Block from "@/plan-creator/enums/block.enum";
 import IBlock from "@/plan-creator/types/block.interface";
-import { planSettingsState } from "@/redux/store";
+import { editorSettingsState } from "@/redux/store";
 import { useDraggable } from "@dnd-kit/core";
 import AspectRatioIcon from "@mui/icons-material/AspectRatio";
 import RotateRight from "@mui/icons-material/RotateRight";
@@ -55,7 +55,7 @@ const DraggableBlock: FC<IDraggableBlockProps> = memo((props) => {
     isLabelDisabled,
     isOneDimension,
   } = block;
-  const { pixelRatio } = useSelector(planSettingsState);
+  const { pixelRatio } = useSelector(editorSettingsState);
   const { attributes, listeners, setNodeRef, isDragging, transform } =
     useDraggable({
       id,

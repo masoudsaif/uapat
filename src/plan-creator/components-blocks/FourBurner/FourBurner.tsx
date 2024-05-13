@@ -2,7 +2,7 @@ import { Grid, GridProps } from "@mui/material";
 import { FC, useMemo } from "react";
 import { useSelector } from "react-redux";
 
-import { planSettingsState } from "../../../redux/store";
+import { editorSettingsState } from "../../../redux/store";
 import IBlock from "../../types/block.interface";
 import Burner from "../Burner/Burner";
 
@@ -16,7 +16,7 @@ const FourBurner: FC<IFourBurnerProps> = ({
   },
   ...props
 }) => {
-  const { pixelRatio } = useSelector(planSettingsState);
+  const { pixelRatio } = useSelector(editorSettingsState);
   const burnerLength = useMemo(() => {
     const shorterSide = width > length ? length : width;
 

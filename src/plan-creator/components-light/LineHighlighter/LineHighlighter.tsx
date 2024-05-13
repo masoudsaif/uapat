@@ -1,7 +1,7 @@
 import Direction from "@/plan-creator/enums/direction.enum";
 import gray from "@/plan-creator/styles/gray";
 import IBlock from "@/plan-creator/types/block.interface";
-import { planSettingsState } from "@/redux/store";
+import { editorSettingsState } from "@/redux/store";
 import { FC, HTMLAttributes, memo } from "react";
 import { useSelector } from "react-redux";
 
@@ -15,7 +15,7 @@ const LineHighlighter: FC<ILineHighlighterProps> = memo(
     const {
       pixelRatio,
       planDimensions: { width, length },
-    } = useSelector(planSettingsState);
+    } = useSelector(editorSettingsState);
 
     return (
       <div

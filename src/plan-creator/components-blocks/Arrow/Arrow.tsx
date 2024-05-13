@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 import IBlock from "../types/block.interface";
 import { inchesToFeetAndInches } from "../utility/units";
-import { planSettingsState } from "@/redux/store";
+import { editorSettingsState } from "@/redux/store";
 import common from "../styles/common-colors";
 
 export interface IArrowProps extends GridProps {
@@ -22,7 +22,7 @@ const Arrow: FC<IArrowProps> = ({
   color = common.black,
   ...props
 }) => {
-  const { pixelRatio } = useSelector(planSettingsState);
+  const { pixelRatio } = useSelector(editorSettingsState);
   const isVertical = useMemo(() => degree === 90 || degree === 270, [degree]);
   const length = useMemo(
     () => (isVertical ? dimensions.width : dimensions.length),

@@ -1,7 +1,7 @@
 import { PLAN_ID } from "@/plan-creator/constants/ids";
 import gray from "@/plan-creator/styles/gray";
 import margin from "@/plan-creator/styles/margin";
-import { planSettingsState } from "@/redux/store";
+import { editorSettingsState } from "@/redux/store";
 import { useDroppable } from "@dnd-kit/core";
 import { Grid } from "@mui/material";
 import { FC, HTMLAttributes, memo, useMemo } from "react";
@@ -14,7 +14,7 @@ export interface IPlanContainerProps extends HTMLAttributes<HTMLDivElement> {
 
 const PlanContainer: FC<IPlanContainerProps> = memo(
   ({ children, ...props }) => {
-    const { planDimensions, pixelRatio } = useSelector(planSettingsState);
+    const { planDimensions, pixelRatio } = useSelector(editorSettingsState);
     const { setNodeRef } = useDroppable({
       id: PLAN_ID,
     });

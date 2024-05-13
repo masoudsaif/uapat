@@ -3,7 +3,7 @@ import {
   imperialDisplayLength,
   metricDisplayLength,
 } from "@/plan-creator/utility/units";
-import { planSettingsState } from "@/redux/store";
+import { editorSettingsState } from "@/redux/store";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -41,7 +41,7 @@ const DimensionArrow: FC<IDimensionArrowProps> = ({
   onVisibilityClick,
   ...props
 }) => {
-  const { pixelRatio, systemUnit } = useSelector(planSettingsState);
+  const { pixelRatio, systemUnit } = useSelector(editorSettingsState);
   const l = useMemo(
     () => length * pixelRatio,
 
