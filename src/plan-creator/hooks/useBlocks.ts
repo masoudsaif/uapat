@@ -1,3 +1,4 @@
+import { editorSettingsState } from "@/redux/store";
 import {
   Active,
   ClientRect,
@@ -8,45 +9,42 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { SENSITIVITY } from "../constants/options";
-import { settingsState } from "../redux/store";
-import { Coordinates, Dimensions } from "../types";
-import IDelta from "../types/delta.interface";
-import IHightlightedLine from "../types/highlighted-line.interface";
-import ISelectedShape from "../types/selected-shape.interface";
-import ISelectionArea from "../types/selection-area.interface";
-import IShape from "../types/shape.interface";
-import { isShapeInSelectionArea, swapDimensions } from "../utility/shapes";
-import { generateKey } from "../utility/string";
 import Direction from "../enums/direction.enum";
+import IBlock from "../types/block.interface";
+import ICoordinates from "../types/coordinates.interface";
+import IDelta from "../types/delta.interface";
+import IDimensions from "../types/dimensions.interface";
+import IHightlightLine from "../types/highlight-line.interface";
+import ISelectedBlock from "../types/selected-block.interface";
+import ISelectionArea from "../types/selection-area.interface";
+import { isBlockInSelectionArea, swapBlockDimensions } from "../utility/blocks";
+import { generateKey } from "../utility/string";
 
-const useShapes = () => {
+const useBlocks = () => {
   const isDelayedRef = useRef(false);
   const isMetaPressedRef = useRef(false);
   const activeIdRef = useRef<string | null>(null);
   const deltaRef = useRef<IDelta>({ x: 0, y: 0 });
   const isResetingSelectedDisabledRef = useRef(false);
   const isMultiSelectDisabledRef = useRef(false);
-  const { inch } = useSelector(settingsState);
+  const { pixelRatio, highlightSensitivity } = useSelector(editorSettingsState);
   const [isDragging, setIsDragging] = useState(false);
-  const [shapes, setShapes] = useState<IShape[]>([]);
-  const [selectedShapes, setSelectedShapes] = useState<ISelectedShape[]>([]);
-  const [highlightedLines, setHighlightedLines] = useState<IHightlightedLine[]>(
-    []
-  );
+  const [blocks, setBlocks] = useState<IBlock[]>([]);
+  const [selectedBlocks, setSelectedBlocks] = useState<ISelectedBlock[]>([]);
+  const [highlightLines, setHighlightLines] = useState<IHightlightLine[]>([]);
 
-  const handleSelectedShapesReset = () => {
+  const handleSelectedBlocksReset = () => {
     if (!isResetingSelectedDisabledRef.current) {
-      setSelectedShapes([]);
+      setSelectedBlocks([]);
     }
   };
 
-  const handleSelectedShapesUpdate = () =>
-    setSelectedShapes([...selectedShapes]);
+  const handleSelectedBlocksUpdate = () =>
+    setSelectedBlocks([...selectedBlocks]);
 
-  const handleShapesUpdate = () => setShapes([...shapes]);
+  const handleBlocksUpdate = () => setBlocks([...blocks]);
 
-  const handleShapeDeleteByIndex = (i: number) => shapes.splice(i, 1);
+  const handleBlockDeleteByIndex = (i: number) => blocks.splice(i, 1);
 
   const handleEnableMultiSelect = () => {
     setTimeout(() => {
@@ -54,99 +52,108 @@ const useShapes = () => {
     }, 0);
   };
 
-  const handleShapeSwapDimensionsByIndex = (i: number) => {
-    swapDimensions(shapes[i]);
-    handleShapesUpdate();
+  const handleBlockSwapDimensionsByIndex = (i: number) => {
+    swapBlockDimensions(blocks[i]);
+    handleBlocksUpdate();
   };
 
-  const handleShapeRotateNinteyByIndex = (i: number) => {
-    const { degree = 0 } = shapes[i];
-    swapDimensions(shapes[i]);
+  const handleBlockRotateNinteyByIndex = (i: number) => {
+    const { degree = 0 } = blocks[i];
+    swapBlockDimensions(blocks[i]);
     if (degree === 270) {
-      shapes[i].degree = 0;
+      blocks[i].degree = 0;
     } else {
-      shapes[i].degree = degree + 90;
+      blocks[i].degree = degree + 90;
     }
 
-    handleShapesUpdate();
+    handleBlocksUpdate();
   };
 
   const getIsCrossingBoundaries = (
-    coordinates: Coordinates,
-    dimensions: Dimensions,
+    coordinates: ICoordinates,
+    dimensions: IDimensions,
     rect: ClientRect
   ) => {
     const { top, bottom, left, right } = rect;
 
-    if (coordinates[0] < left) {
+    if (coordinates.x < left) {
       return true;
     }
 
-    if (coordinates[0] + dimensions[1] * inch > right) {
+    if (coordinates.x + dimensions.length * pixelRatio > right) {
       return true;
     }
 
-    if (coordinates[1] < top) {
+    if (coordinates.y < top) {
       return true;
     }
 
-    if (coordinates[1] + dimensions[0] * inch > bottom + window.scrollY) {
+    if (
+      coordinates.y + dimensions.width * pixelRatio >
+      bottom + window.scrollY
+    ) {
       return true;
     }
 
     return false;
   };
 
-  const getShapeNextCords = (
-    shape: IShape,
+  const getBlockNextCords = (
+    block: IBlock,
     delta: IDelta,
     rect: ClientRect
   ) => {
     const { x, y } = delta;
-    const shapeX = shape.coordinates![0] + x;
-    const shapeY = shape.coordinates![1] + y;
+    const blockX = block.coordinates!.x + x;
+    const blockY = block.coordinates!.y + y;
 
-    const coordinates: Coordinates = [shapeX, shapeY];
+    const coordinates: ICoordinates = {
+      x: blockX,
+      y: blockY,
+    };
 
-    if (getIsCrossingBoundaries(coordinates, shape.dimensions, rect)) {
+    if (getIsCrossingBoundaries(coordinates, block.dimensions, rect)) {
       return null;
     }
 
-    shape.rect = {
-      width: shape.dimensions[1] * inch,
-      height: shape.dimensions[0] * inch,
-      left: shapeX,
-      top: shapeY,
-      right: shapeX + shape.dimensions[1] * inch,
-      bottom: shapeY + shape.dimensions[0] * inch,
+    block.rect = {
+      width: block.dimensions.length * pixelRatio,
+      height: block.dimensions.width * pixelRatio,
+      left: blockX,
+      top: blockY,
+      right: blockX + block.dimensions.length * pixelRatio,
+      bottom: blockY + block.dimensions.width * pixelRatio,
     };
 
     return coordinates;
   };
 
-  const handleShapeEnter = (active: Active, rect: ClientRect) => {
+  const handleBlockEnter = (active: Active, rect: ClientRect) => {
     const { left, bottom } = active.rect.current.translated!;
-    const shapeX = left + window.scrollX;
-    const shape = active.data.current as IShape;
-    const { dimensions } = shape;
-    const shapeY = bottom - dimensions[0] * inch + window.scrollY;
-    const coordinates: Coordinates = [shapeX, shapeY];
+    const blockX = left + window.scrollX;
+    const block = active.data.current as IBlock;
+    const { dimensions } = block;
+    const blockY = bottom - dimensions.width * pixelRatio + window.scrollY;
+    const coordinates: ICoordinates = {
+      x: blockX,
+      y: blockY,
+    };
 
     const shapeRect: ClientRect = {
-      width: shape.dimensions[1] * inch,
-      height: shape.dimensions[0] * inch,
-      left: shapeX,
-      top: shapeY,
-      right: shapeX + shape.dimensions[1] * inch,
-      bottom: shapeY + shape.dimensions[0] * inch,
+      width: block.dimensions.length * pixelRatio,
+      height: block.dimensions.width * pixelRatio,
+      left: blockX,
+      top: blockY,
+      right: blockX + block.dimensions.length * pixelRatio,
+      bottom: blockY + block.dimensions.width * pixelRatio,
     };
 
     if (getIsCrossingBoundaries(coordinates, dimensions, rect)) {
       return;
     }
 
-    shapes.push({
-      ...shape,
+    blocks.push({
+      ...block,
       id: `${active.id}${generateKey()}`,
       coordinates,
       dimensions,
@@ -154,22 +161,22 @@ const useShapes = () => {
     });
   };
 
-  const handleShapeResize = (i: number, w: number, l: number) => {
-    shapes[i].dimensions = [w, l];
-    handleShapesUpdate();
+  const handleBlockResize = (i: number, width: number, length: number) => {
+    blocks[i].dimensions = { width, length };
+    handleBlocksUpdate();
   };
 
-  const handleShapeSelect = (id: string) => {
+  const handleBlockSelect = (id: string) => {
     isResetingSelectedDisabledRef.current = true;
-    const index = shapes.findIndex((s) => id === s.id);
+    const index = blocks.findIndex((s) => id === s.id);
     if (index !== -1) {
       if (isMetaPressedRef.current) {
-        if (!selectedShapes.some((s) => id === s.id)) {
-          selectedShapes.push({ id, index });
-          handleSelectedShapesUpdate();
+        if (!selectedBlocks.some((s) => id === s.id)) {
+          selectedBlocks.push({ id, index });
+          handleSelectedBlocksUpdate();
         }
       } else {
-        setSelectedShapes([{ id, index }]);
+        setSelectedBlocks([{ id, index }]);
       }
     }
     setTimeout(() => {
@@ -177,7 +184,7 @@ const useShapes = () => {
     }, 0);
   };
 
-  const handleShapeMultiSelect = (coordinates: ISelectionArea) => {
+  const handleBlockMultiSelect = (coordinates: ISelectionArea) => {
     const { startX, endX, startY, endY } = coordinates;
 
     if (
@@ -185,15 +192,15 @@ const useShapes = () => {
       !isMultiSelectDisabledRef.current
     ) {
       isResetingSelectedDisabledRef.current = true;
-      const filteredShapes: ISelectedShape[] = [];
+      const filteredBlocks: ISelectedBlock[] = [];
 
-      shapes.forEach((shape, index) => {
-        if (isShapeInSelectionArea(coordinates, shape)) {
-          filteredShapes.push({ id: shape.id, index });
+      blocks.forEach((block, index) => {
+        if (isBlockInSelectionArea(coordinates, block)) {
+          filteredBlocks.push({ id: block.id, index });
         }
       });
 
-      setSelectedShapes(filteredShapes);
+      setSelectedBlocks(filteredBlocks);
       setTimeout(() => {
         isResetingSelectedDisabledRef.current = false;
       }, 0);
@@ -206,79 +213,79 @@ const useShapes = () => {
     // console.log(eventsRef.current);
     // if (current[current.length - 1]) {
     //   isUndoRef.current = true;
-    //   setShapes(eventsRef.current[current.length - 1]);
-    //   setSelectedShapes([]);
+    //   setBlocks(eventsRef.current[current.length - 1]);
+    //   setSelectedBlocks([]);
     // } else {
     //   isUndoRef.current = true;
-    //   setShapes([]);
-    //   setSelectedShapes([]);
+    //   setBlocks([]);
+    //   setSelectedBlocks([]);
     // }
   };
 
-  const handleShapeLineHighlights = (active: Active) => {
-    const newHighlightedLines: IHightlightedLine[] = [];
+  const handleBlockLineHighlights = (active: Active) => {
+    const newHighlightLines: IHightlightLine[] = [];
     if (!active.rect.current.translated) {
       return;
     }
     const { left, bottom } = active.rect.current.translated;
-    const shapeX = left + window.scrollX;
-    const shape = active.data.current as IShape;
-    const { dimensions } = shape;
-    const shapeY = bottom - dimensions[0] * inch + window.scrollY;
+    const blockX = left + window.scrollX;
+    const block = active.data.current as IBlock;
+    const { dimensions } = block;
+    const blockY = bottom - dimensions.width * pixelRatio + window.scrollY;
 
     const rect: ClientRect = {
-      width: shape.dimensions[1] * inch,
-      height: shape.dimensions[0] * inch,
-      left: shapeX,
-      top: shapeY,
-      right: shapeX + shape.dimensions[1] * inch,
-      bottom: shapeY + shape.dimensions[0] * inch,
+      width: block.dimensions.length * pixelRatio,
+      height: block.dimensions.width * pixelRatio,
+      left: blockX,
+      top: blockY,
+      right: blockX + block.dimensions.length * pixelRatio,
+      bottom: blockY + block.dimensions.width * pixelRatio,
     };
-    shapes.forEach((s) => {
-      // if (selectedShapes.length > 1) {
-      //   if (selectedShapes.some(({ id }) => id === s.id)) {
+    blocks.forEach((b) => {
+      // if (selectedBlocks.length > 1) {
+      //   if (selectedBlocks.some(({ id }) => id === s.id)) {
       //     return;
       //   }
       // }
-      if (s.id !== shape?.id && s.rect) {
+      if (b.id !== block?.id && b.rect) {
         if (
-          Math.abs(s.rect!.top - rect.top) < SENSITIVITY ||
-          Math.abs(s.rect!.top - rect.bottom) < SENSITIVITY
+          Math.abs(b.rect!.top - rect.top) < highlightSensitivity ||
+          Math.abs(b.rect!.top - rect.bottom) < highlightSensitivity
         ) {
-          newHighlightedLines.push({ line: Direction.TOP, shape: s });
+          newHighlightLines.push({ line: Direction.TOP, block: b });
         }
         if (
-          Math.abs(s.rect!.bottom - rect.top) < SENSITIVITY ||
-          Math.abs(s.rect!.bottom - rect.bottom) < SENSITIVITY
+          Math.abs(b.rect!.bottom - rect.top) < highlightSensitivity ||
+          Math.abs(b.rect!.bottom - rect.bottom) < highlightSensitivity
         ) {
-          newHighlightedLines.push({ line: Direction.BOTTOM, shape: s });
+          newHighlightLines.push({ line: Direction.BOTTOM, block: b });
         }
         if (
-          Math.abs(s.rect!.left - rect.left) < SENSITIVITY ||
-          Math.abs(s.rect!.left - rect.right) < SENSITIVITY
+          Math.abs(b.rect!.left - rect.left) < highlightSensitivity ||
+          Math.abs(b.rect!.left - rect.right) < highlightSensitivity
         ) {
-          newHighlightedLines.push({ line: Direction.LEFT, shape: s });
+          newHighlightLines.push({ line: Direction.LEFT, block: b });
         }
         if (
-          Math.abs(s.rect!.right - rect.left) < SENSITIVITY ||
-          Math.abs(s.rect!.right - rect.right) < SENSITIVITY
+          Math.abs(b.rect!.right - rect.left) < highlightSensitivity ||
+          Math.abs(b.rect!.right - rect.right) < highlightSensitivity
         ) {
-          newHighlightedLines.push({ line: Direction.RIGHT, shape: s });
+          newHighlightLines.push({ line: Direction.RIGHT, block: b });
         }
       }
     });
-    setHighlightedLines(newHighlightedLines);
+    setHighlightLines(newHighlightLines);
   };
 
-  const handleShapeDragStart = (e: DragStartEvent) => {
+  const handleBlockDragStart = (e: DragStartEvent) => {
     deltaRef.current = { x: 0, y: 0 };
     setIsDragging(true);
     activeIdRef.current = e.active.id.toString();
 
-    if (!shapes.some(({ id }) => id === activeIdRef.current)) {
-      setSelectedShapes([]);
-    } else if (selectedShapes.length < 2) {
-      handleShapeSelect(activeIdRef.current);
+    if (!blocks.some(({ id }) => id === activeIdRef.current)) {
+      setSelectedBlocks([]);
+    } else if (selectedBlocks.length < 2) {
+      handleBlockSelect(activeIdRef.current);
     }
     isDelayedRef.current = false;
     isMultiSelectDisabledRef.current = true;
@@ -287,8 +294,8 @@ const useShapes = () => {
     }, 0);
   };
 
-  const handleShapeDragMove = (e: DragMoveEvent) => {
-    if (selectedShapes.length > 1) {
+  const handleBlockDragMove = (e: DragMoveEvent) => {
+    if (selectedBlocks.length > 1) {
       const { delta, over } = e;
       const updatedDelta = {
         x: delta.x - deltaRef.current.x,
@@ -296,11 +303,11 @@ const useShapes = () => {
       };
       deltaRef.current = delta;
       if (over) {
-        let movements: { index: number; coordinates: Coordinates }[] = [];
+        let movements: { index: number; coordinates: ICoordinates }[] = [];
 
-        for (let i = 0; i < selectedShapes.length; i++) {
-          const newCords = getShapeNextCords(
-            shapes[selectedShapes[i].index],
+        for (let i = 0; i < selectedBlocks.length; i++) {
+          const newCords = getBlockNextCords(
+            blocks[selectedBlocks[i].index],
             updatedDelta,
             over.rect
           );
@@ -311,28 +318,28 @@ const useShapes = () => {
           }
 
           movements.push({
-            index: selectedShapes[i].index,
+            index: selectedBlocks[i].index,
             coordinates: newCords,
           });
         }
 
         movements.forEach(({ index, coordinates }) => {
-          shapes[index].coordinates = coordinates;
+          blocks[index].coordinates = coordinates;
         });
       }
     } else {
-      setTimeout(() => handleShapeLineHighlights(e.active), 0);
+      setTimeout(() => handleBlockLineHighlights(e.active), 0);
     }
   };
 
-  const handleShapeDragEnd = (e: DragEndEvent) => {
+  const handleBlockDragEnd = (e: DragEndEvent) => {
     setIsDragging(false);
-    setTimeout(() => setHighlightedLines([]), 0);
-    const i = shapes.findIndex(({ id }) => id === e.active.id);
+    setTimeout(() => setHighlightLines([]), 0);
+    const i = blocks.findIndex(({ id }) => id === e.active.id);
     activeIdRef.current = null;
     const { over, delta } = e;
 
-    if (selectedShapes.length < 2) {
+    if (selectedBlocks.length < 2) {
       if (i !== -1) {
         handleEnableMultiSelect();
         if (!isDelayedRef.current) {
@@ -340,33 +347,33 @@ const useShapes = () => {
         }
 
         if (!over) {
-          handleShapeDeleteByIndex(i);
-          handleShapesUpdate();
+          handleBlockDeleteByIndex(i);
+          handleBlocksUpdate();
           return;
         }
 
-        const coordinates = getShapeNextCords(shapes[i], delta, over.rect);
+        const coordinates = getBlockNextCords(blocks[i], delta, over.rect);
 
         if (coordinates) {
-          shapes[i].coordinates = coordinates;
+          blocks[i].coordinates = coordinates;
         }
-        handleShapesUpdate();
+        handleBlocksUpdate();
       } else if (over) {
         handleEnableMultiSelect();
-        handleShapeEnter(e.active, over.rect);
-        handleShapesUpdate();
+        handleBlockEnter(e.active, over.rect);
+        handleBlocksUpdate();
       }
     } else {
       handleEnableMultiSelect();
     }
   };
 
-  const handleDeleteSelectedShapes = () => {
-    if (selectedShapes.length !== 0) {
-      setShapes(
-        shapes.filter((shape) => !selectedShapes.some((s) => s.id === shape.id))
+  const handleDeleteSelectedBlocks = () => {
+    if (selectedBlocks.length !== 0) {
+      setBlocks(
+        blocks.filter((shape) => !selectedBlocks.some((s) => s.id === shape.id))
       );
-      handleSelectedShapesReset();
+      handleSelectedBlocksReset();
     }
   };
 
@@ -377,7 +384,7 @@ const useShapes = () => {
       e.keyCode === 8 ||
       e.keyCode === 46
     ) {
-      handleDeleteSelectedShapes();
+      handleDeleteSelectedBlocks();
     }
   };
 
@@ -395,7 +402,7 @@ const useShapes = () => {
 
   const handleAPress = (e: KeyboardEvent) => {
     if (e.key.toLowerCase() === "a" && isMetaPressedRef.current) {
-      setSelectedShapes(shapes.map(({ id }, index) => ({ id, index })));
+      setSelectedBlocks(blocks.map(({ id }, index) => ({ id, index })));
     }
   };
 
@@ -412,7 +419,7 @@ const useShapes = () => {
       document.removeEventListener("keydown", handleZPress);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shapes]);
+  }, [blocks]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleDeletePress);
@@ -427,28 +434,28 @@ const useShapes = () => {
       document.removeEventListener("keyup", handleMetaUp);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedShapes]);
+  }, [selectedBlocks]);
 
   return {
     isDragging,
-    shapes,
-    highlightedLines,
-    selectedShapes,
-    handleSelectedShapesReset,
-    handleShapeSelect,
-    handleShapeDragMove,
-    handleShapeResize,
-    handleShapeSwapDimensionsByIndex,
-    handleShapeRotateNinteyByIndex,
-    handleShapeDeleteByIndex,
-    handleShapesUpdate,
+    blocks,
+    highlightLines,
+    selectedBlocks,
+    handleSelectedBlocksReset,
+    handleBlockSelect,
+    handleBlockDragMove,
+    handleBlockResize,
+    handleBlockSwapDimensionsByIndex,
+    handleBlockRotateNinteyByIndex,
+    handleBlockDeleteByIndex,
+    handleBlocksUpdate,
     getIsCrossingBoundaries,
-    getShapeNextCords,
-    handleShapeMultiSelect,
-    handleShapeEnter,
-    handleShapeDragStart,
-    handleShapeDragEnd,
+    getBlockNextCords,
+    handleBlockMultiSelect,
+    handleBlockEnter,
+    handleBlockDragStart,
+    handleBlockDragEnd,
   };
 };
 
-export default useShapes;
+export default useBlocks;
