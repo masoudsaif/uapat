@@ -1,13 +1,16 @@
+import SystemUnit from "@/plan-creator/enums/system-unit.enum";
+import common from "@/plan-creator/styles/common-colors";
+import IBlock from "@/plan-creator/types/block.interface";
+import {
+  imperialDisplayLength,
+  metricDisplayLength,
+} from "@/plan-creator/utility/units";
+import { editorSettingsState } from "@/redux/store";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Grid, GridProps, Typography } from "@mui/material";
 import { FC, useMemo } from "react";
 import { useSelector } from "react-redux";
-
-import IBlock from "../types/block.interface";
-import { inchesToFeetAndInches } from "../utility/units";
-import { editorSettingsState } from "@/redux/store";
-import common from "../styles/common-colors";
 
 export interface IArrowProps extends GridProps {
   block: IBlock;
@@ -22,14 +25,24 @@ const Arrow: FC<IArrowProps> = ({
   color = common.black,
   ...props
 }) => {
-  const { pixelRatio } = useSelector(editorSettingsState);
+  const { pixelRatio, systemUnit } = useSelector(editorSettingsState);
   const isVertical = useMemo(() => degree === 90 || degree === 270, [degree]);
   const length = useMemo(
     () => (isVertical ? dimensions.width : dimensions.length),
     [isVertical, dimensions]
   );
-  const l = useMemo(() => length * pixelRatio, [length, pixelRatio]);
-  const displayLength = useMemo(() => inchesToFeetAndInches(length), [length]);
+  const l = useMemo(
+    () => length * pixelRatio,
+
+    [length, pixelRatio]
+  );
+  const displayLength = useMemo(
+    () =>
+      (systemUnit === SystemUnit.IMPERIAL
+        ? imperialDisplayLength
+        : metricDisplayLength)(length),
+    [length, systemUnit]
+  );
 
   return (
     <Grid
@@ -77,7 +90,7 @@ const Arrow: FC<IArrowProps> = ({
           ...(isVertical && { bottom: -18 }),
         }}
       >
-        {`${displayLength.ft}' ${displayLength.inches}"`}
+        {displayLength}
       </Typography>
     </Grid>
   );

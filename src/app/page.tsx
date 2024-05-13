@@ -1,7 +1,7 @@
-import PlanCreator from "@/plan-creator/PlanCreator";
+import PlanCreatorApp from "@/plan-creator/PlanCreatorApp";
 
 const Home = () => {
-  return <PlanCreator />;
+  return <PlanCreatorApp />;
 };
 
 export default Home;

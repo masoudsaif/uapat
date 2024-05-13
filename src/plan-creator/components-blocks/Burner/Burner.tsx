@@ -1,5 +1,5 @@
+import common from "@/plan-creator/styles/common-colors";
 import { FC, HTMLAttributes, memo } from "react";
-import common from "../styles/common-colors";
 
 export interface IBurnerProps extends HTMLAttributes<HTMLDivElement> {
   length: number;

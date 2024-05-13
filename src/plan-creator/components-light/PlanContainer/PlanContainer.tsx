@@ -27,13 +27,11 @@ const PlanContainer: FC<IPlanContainerProps> = memo(
     );
 
     return (
-      <Grid
+      <div
         {...props}
-        container
         id={PLAN_ID}
         ref={setNodeRef}
-        sx={{
-          ml: margin(8),
+        style={{
           border: `${1}px solid ${gray[500]}`,
           width: dimensions.length,
           height: dimensions.width,
@@ -41,7 +39,7 @@ const PlanContainer: FC<IPlanContainerProps> = memo(
         }}
       >
         {children}
-      </Grid>
+      </div>
     );
   }
 );
