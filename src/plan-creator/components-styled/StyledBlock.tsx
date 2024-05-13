@@ -2,7 +2,7 @@ import { Transform } from "@dnd-kit/utilities";
 import { Grid, GridProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-export interface IStyledShapeProps extends GridProps {
+export interface IStyledBlockProps extends GridProps {
   isDragging?: boolean;
   borderWidth?: number;
   transform?: Transform;
@@ -10,7 +10,7 @@ export interface IStyledShapeProps extends GridProps {
   isBackground?: boolean;
 }
 
-const StyledShape = styled(Grid)<IStyledShapeProps>(
+const StyledBlock = styled(Grid)<IStyledBlockProps>(
   ({
     borderWidth = 1,
     theme,
@@ -47,4 +47,4 @@ const StyledShape = styled(Grid)<IStyledShapeProps>(
   })
 );
 
-export default StyledShape;
+export default StyledBlock;

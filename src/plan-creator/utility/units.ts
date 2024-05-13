@@ -1,6 +1,18 @@
-export const inchesToFeetAndInches = (inch: number) => {
-  const ft = Math.floor(inch / 12);
-  const inches = inch % 12;
+export const imperialDisplayLength = (length: number) => {
+  if (length < 12) {
+    return `${Math.round(length)}"`;
+  }
 
-  return { ft, inches: Math.round(inches) };
+  const ft = Math.floor(length / 12);
+  const inches = length % 12;
+
+  return `${ft}' ${Math.round(inches)}"`;
+};
+
+export const metricDisplayLength = (length: number) => {
+  if (length >= 100) {
+    return `${Math.round(length) / 100} M`;
+  }
+
+  return `${Math.round(length * 100) / 100} CM`;
 };
